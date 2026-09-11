@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChartView } from "./chart-view";
+import { KpiCard } from "./kpi-card";
 import type { Visualization } from "@/lib/types";
 
 export function ChartCarousel({
@@ -21,6 +22,19 @@ export function ChartCarousel({
 
   if (visualizations.length === 0) {
     return <p className="text-sm text-muted-foreground">No charts available for the latest result.</p>;
+  }
+
+  // When every suggestion is a KPI tile, show them together in a row instead of
+  // paging through them one at a time — KPIs are compact and meant to be scanned together.
+  const allKpi = visualizations.every((v) => v.type === "kpi");
+  if (allKpi) {
+    return (
+      <div className="flex flex-wrap gap-4">
+        {visualizations.map((viz, i) => (
+          <KpiCard key={i} viz={viz} rows={rows} />
+        ))}
+      </div>
+    );
   }
 
   const current = visualizations[index];

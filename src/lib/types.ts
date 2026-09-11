@@ -62,10 +62,12 @@ export interface ChatRequest {
 }
 
 export interface Visualization {
-  type: "bar" | "line" | "pie" | "scatter" | "area";  // widened from "bar" | "line"
-  x: string;
-  y: string;
-  title: string;  // new
+  type: "bar" | "line" | "pie" | "scatter" | "area" | "kpi";
+  title: string;
+  x?: string;
+  y?: string;
+  value?: string;
+  label?: string;
 }
 
 export interface ChatResponse {
