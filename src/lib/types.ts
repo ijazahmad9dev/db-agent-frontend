@@ -58,6 +58,7 @@ export interface TableSelectionResponse {
 
 export interface ChatRequest {
   connection_id: string;
+  session_id?: string;
   question: string;
 }
 
@@ -69,15 +70,30 @@ export interface Visualization {
   value?: string;
   label?: string;
 }
+export interface ChatSession {
+  id: string;
+  connection_id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface ChatResponse {
+  session_id: string;
   answer: string | null;
   query: string | null;
   columns: string[] | null;
   rows: Record<string, unknown>[] | null;
   metadata: { row_count: number; truncated: boolean } | null;
-  visualizations: Visualization[] | null;  // was: visualization: Visualization | null
+  visualizations: Visualization[] | null;
   error: string | null;
+}
+
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  question: string | null;
+  response: ChatResponse | null;
+  created_at: string;
 }
 
 export interface ERDEdge {

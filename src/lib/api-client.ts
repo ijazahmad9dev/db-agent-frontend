@@ -1,6 +1,7 @@
 import type {
   Connection, ConnectionTestResult, TableListResponse, SchemaResponse, ERDResponse,
   TableSelectionResponse, ChatRequest, ChatResponse, SemanticLayer,
+  ChatSession, ChatHistoryMessage,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
@@ -38,10 +39,8 @@ export const api = {
   logout: () => request<{ status: string }>("/auth/logout", { method: "POST" }),
 
   listConnections: () => request<Connection[]>("/connections"),
-
   createConnection: (name: string, source_type: string, config: Record<string, unknown>) =>
     request<Connection>("/connections", { method: "POST", body: JSON.stringify({ name, source_type, config }) }),
-
   createCSVConnection: async (name: string, files: File[]) => {
     const formData = new FormData();
     formData.append("name", name);
@@ -54,10 +53,8 @@ export const api = {
     }
     return res.json() as Promise<Connection>;
   },
-
   createGSheetsConnection: (name: string, sheet_url: string) =>
     request<Connection>("/connections/gsheets", { method: "POST", body: JSON.stringify({ name, sheet_url }) }),
-
   testConnection: (id: string) => request<ConnectionTestResult>(`/connections/${id}/test`, { method: "POST" }),
   listTables: (id: string) => request<TableListResponse>(`/connections/${id}/tables`),
   getSchema: (id: string, tables?: string[]) =>
@@ -73,7 +70,18 @@ export const api = {
     request<SemanticLayer>(`/connections/${id}/semantic`, { method: "PUT", body: JSON.stringify(layer) }),
   deleteConnection: (id: string, hard = true) =>
     request<{ status: string }>(`/connections/${id}?hard=${hard}`, { method: "DELETE" }),
+
   chat: (payload: ChatRequest) => request<ChatResponse>("/chat", { method: "POST", body: JSON.stringify(payload) }),
+  createChatSession: (connection_id: string) =>
+    request<ChatSession>("/chat/sessions", { method: "POST", body: JSON.stringify({ connection_id }) }),
+  listChatSessions: (connectionId: string) =>
+    request<ChatSession[]>(`/chat/sessions?connection_id=${connectionId}`),
+  renameChatSession: (sessionId: string, title: string) =>
+    request<ChatSession>(`/chat/sessions/${sessionId}`, { method: "PATCH", body: JSON.stringify({ title }) }),
+  deleteChatSession: (sessionId: string) =>
+    request<{ status: string }>(`/chat/sessions/${sessionId}`, { method: "DELETE" }),
+  getChatSessionHistory: (sessionId: string) =>
+    request<ChatHistoryMessage[]>(`/chat/sessions/${sessionId}/history`),
 };
 
 export { ApiError };
