@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, ApiError } from "@/lib/api-client";
 import type { ChatHistoryMessage } from "@/lib/types";
 
 export function useChatSession(connectionId: string, sessionId: string | null) {
@@ -24,15 +24,44 @@ export function useChatSession(connectionId: string, sessionId: string | null) {
     },
   });
 
-  const messages: ChatHistoryMessage[] = historyQuery.data ?? [];
-  const latestAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+  const historyMessages: ChatHistoryMessage[] = historyQuery.data ?? [];
+
+  // The real history entry for the in-flight question only exists once the round
+  // trip completes AND history refetches — without this, the user's own question
+  // would be invisible the entire time the backend is working, which is exactly
+  // the "question disappears" bug: only "Thinking..." showed, with nothing above it.
+  const pendingQuestion = chatMutation.isPending ? chatMutation.variables : undefined;
+  const messages: ChatHistoryMessage[] = pendingQuestion
+    ? [
+        ...historyMessages,
+        {
+          role: "user",
+          question: pendingQuestion,
+          response: null,
+          created_at: new Date().toISOString(),
+        },
+      ]
+    : historyMessages;
+
+  const latestAssistant = [...historyMessages].reverse().find((m) => m.role === "assistant");
   const optimisticLatest = chatMutation.data;
+
+  // Surface a readable message on failure instead of the request silently
+  // reverting with no feedback at all — that silence was the other half of why
+  // it looked like the question just "disappeared."
+  const chatError =
+    chatMutation.isError
+      ? chatMutation.error instanceof ApiError
+        ? chatMutation.error.message
+        : "Something went wrong sending that question. Please try again."
+      : null;
 
   return {
     messages,
     askQuestion: (question: string) => chatMutation.mutate(question),
     isPending: chatMutation.isPending,
     isLoadingHistory: historyQuery.isLoading,
+    chatError,
     // Prefer the just-returned response (instant) over refetched history (one round-trip behind)
     latestResponse: optimisticLatest ?? latestAssistant?.response,
   };

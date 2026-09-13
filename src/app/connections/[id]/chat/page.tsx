@@ -29,7 +29,7 @@ export default function ChatPage() {
     router.replace(`/connections/${id}/chat?${params.toString()}`);
   };
 
-  const { messages, askQuestion, isPending, latestResponse } = useChatSession(id, activeSessionId);
+  const { messages, askQuestion, isPending, latestResponse, chatError } = useChatSession(id, activeSessionId);
 
   // When a brand-new chat's first question comes back with a real session_id, adopt
   // it as the active session — otherwise the URL/sidebar never reflect the new chat.
@@ -66,7 +66,7 @@ export default function ChatPage() {
           </TabsList>
 
           <TabsContent value="chat">
-            <ChatThread messages={messages} isPending={isPending} onAsk={askQuestion} />
+            <ChatThread messages={messages} isPending={isPending} onAsk={askQuestion} error={chatError} />
           </TabsContent>
           <TabsContent value="sql">
             {latestResponse?.query ? <QueryViewer query={latestResponse.query} /> : <p className="text-sm text-muted-foreground">No query generated yet.</p>}

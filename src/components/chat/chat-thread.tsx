@@ -6,11 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ChatHistoryMessage } from "@/lib/types";
 
 export function ChatThread({
-  messages, isPending, onAsk,
+  messages, isPending, onAsk, error,
 }: {
   messages: ChatHistoryMessage[];
   isPending: boolean;
   onAsk: (question: string) => void;
+  error?: string | null;
 }) {
   const [question, setQuestion] = useState("");
 
@@ -34,6 +35,9 @@ export function ChatThread({
           )
         )}
         {isPending && <p className="text-sm text-muted-foreground">Thinking...</p>}
+        {/* Without this, a failed request just silently reverted with no feedback
+            at all — from the user's point of view the question simply vanished. */}
+        {!isPending && error && <p className="max-w-2xl text-sm text-destructive">{error}</p>}
       </div>
 
       <div className="flex gap-2">
