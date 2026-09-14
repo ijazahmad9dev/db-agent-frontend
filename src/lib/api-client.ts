@@ -2,6 +2,7 @@ import type {
   Connection, ConnectionTestResult, TableListResponse, SchemaResponse, ERDResponse,
   TableSelectionResponse, ChatRequest, ChatResponse, SemanticLayer,
   ChatSession, ChatHistoryMessage,
+  RelationshipsUpdatePayload,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
@@ -82,6 +83,11 @@ export const api = {
     request<{ status: string }>(`/chat/sessions/${sessionId}`, { method: "DELETE" }),
   getChatSessionHistory: (sessionId: string) =>
     request<ChatHistoryMessage[]>(`/chat/sessions/${sessionId}/history`),
+  updateRelationships: (id: string, payload: RelationshipsUpdatePayload) =>
+    request<SemanticLayer>(`/connections/${id}/semantic/relationships`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
 };
 
 export { ApiError };

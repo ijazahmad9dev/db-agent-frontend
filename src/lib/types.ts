@@ -45,6 +45,10 @@ export interface ERDEdge {
   from_column: string;
   to_table: string;
   to_column: string;
+  cardinality: "one-to-one" | "many-to-one" | "many-to-many";
+  source: "fk" | "semantic";
+  from_optional: boolean;
+  to_optional: boolean;
 }
 
 export interface ERDResponse {
@@ -96,15 +100,6 @@ export interface ChatHistoryMessage {
   created_at: string;
 }
 
-export interface ERDEdge {
-  from_table: string;
-  from_column: string;
-  to_table: string;
-  to_column: string;
-  cardinality: "one-to-one" | "many-to-one" | "many-to-many";
-  source: "fk" | "semantic";
-}
-
 export interface ColumnSemantic {
   original_name: string;
   business_name: string;
@@ -119,19 +114,30 @@ export interface TableSemantic {
   business_rules: string[];
 }
 
-export interface RelationshipSemantic {
+export interface RelationshipKey {
   from_table: string;
   from_column: string;
   to_table: string;
   to_column: string;
+}
+
+export interface RelationshipSemantic extends RelationshipKey {
   cardinality: "one-to-one" | "many-to-one" | "many-to-many";
   description: string;
+  from_optional: boolean;
+  to_optional: boolean;
 }
 
 export interface SemanticLayer {
   connection_id: string;
   tables: Record<string, TableSemantic>;
   relationships: RelationshipSemantic[];
+  removed_relationships: RelationshipKey[];
+}
+
+export interface RelationshipsUpdatePayload {
+  relationships: RelationshipSemantic[];
+  removed_relationships: RelationshipKey[];
 }
 
 export interface CurrentUser {
