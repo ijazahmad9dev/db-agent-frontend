@@ -39,10 +39,9 @@ export default function TableSelectionPage() {
 
   const handleSave = () => {
     selectMutation.mutate(Array.from(checked), {
-      onSuccess: () => draftMutation.mutate(undefined, { onSuccess: () => router.push(`/connections/${id}/chat`) }),
+      onSuccess: () => draftMutation.mutate(undefined, { onSuccess: () => router.push(`/connections/${id}/erd`) }),
     });
   };
-
   if (isLoading) return <div className="space-y-2">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-10" />)}</div>;
 
   return (
