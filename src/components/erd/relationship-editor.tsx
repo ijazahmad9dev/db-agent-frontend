@@ -107,19 +107,19 @@ export function RelationshipEditor({ connectionId, sourceType }: { connectionId:
 
   const tableNames = schema?.tables.map((t) => t.name) ?? [];
 
-  if (!editable) {
-    return (
-      <Button variant="outline" size="sm" disabled title="Relationship editing is only available for Postgres/MySQL connections">
-        Manage relationships
-      </Button>
-    );
-  }
+  // if (!editable) {
+  //   return (
+  //     <Button variant="outline" size="sm" disabled title="Relationship editing is only available for Postgres/MySQL connections">
+  //       Manage relationships
+  //     </Button>
+  //   );
+  // }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <Button variant="outline" size="sm" onClick={() => handleOpenChange(true)}>
+      {/* <Button variant="outline" size="sm" onClick={() => handleOpenChange(true)}>
         Manage relationships
-      </Button>
+      </Button> */}
       <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Table relationships</DialogTitle></DialogHeader>
 

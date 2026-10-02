@@ -51,14 +51,14 @@ function markersFor(e: ERDEdge): { markerStart: string; markerEnd: string } {
   };
 }
 
-export function ERDViewer({ erd }: { erd: ERDResponse }) {
+export function ERDViewer({ erd, onSelectTable }: { erd: ERDResponse; onSelectTable?: (tableName: string) => void }) {
   const { nodes, edges } = useMemo(() => {
     const cols = 3;
     const nodes: Node[] = erd.nodes.map((n, i) => ({
       id: n.name,
       type: "table",
       position: { x: (i % cols) * 300, y: Math.floor(i / cols) * 260 },
-      data: n,
+      data: { ...n, onSelect: onSelectTable },
     }));
 
     const edges: Edge[] = erd.edges.map((e, i) => {
@@ -75,7 +75,7 @@ export function ERDViewer({ erd }: { erd: ERDResponse }) {
     });
 
     return { nodes, edges };
-  }, [erd]);
+  }, [erd, onSelectTable]);
 
   return (
     <div className="relative h-[70vh] w-full rounded-md border text-muted-foreground">

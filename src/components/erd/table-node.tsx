@@ -1,9 +1,15 @@
 import { Handle, Position } from "@xyflow/react";
 import type { ERDNode } from "@/lib/types";
 
-export function TableNode({ data }: { data: ERDNode }) {
+type TableNodeData = ERDNode & { onSelect?: (tableName: string) => void };
+
+export function TableNode({ data }: { data: TableNodeData }) {
   return (
-    <div className="min-w-[200px] rounded-md border bg-background shadow-sm">
+    <div
+      className="min-w-[200px] cursor-pointer rounded-md border bg-background shadow-sm transition-colors hover:border-primary"
+      onClick={() => data.onSelect?.(data.name)}
+      title="Click to view and edit business name & description"
+    >
       <Handle type="target" position={Position.Left} />
       <Handle type="source" position={Position.Right} />
       <div className="rounded-t-md bg-muted px-3 py-1.5 text-sm font-semibold">{data.name}</div>
